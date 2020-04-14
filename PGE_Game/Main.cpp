@@ -11,9 +11,11 @@ public:
 	}
 	// Sprites & Decals
 	olc::Sprite* sprPerso	= nullptr;
+	olc::Sprite* sprSheet	= nullptr;
 	olc::Sprite* sprBar		= nullptr;
 	olc::Sprite* sprTown	= nullptr;
 	olc::Decal* decPerso	= nullptr;
+	olc::Decal* decSheet	= nullptr;
 	olc::Decal* decBar		= nullptr;
 	olc::Decal* decTown		= nullptr;
 	// Postions & speeds
@@ -32,14 +34,19 @@ public:
 	// Layers's #
 	int nLayerBack = 0;
 	int nLayerHUD = 0;
+	// Flag
+	int strike_animation;
+	double strike_animation_timer;
 
 	bool OnUserCreate() override {
 		// Sprites assignment
 		sprPerso	= new olc::Sprite("../Sprites/Lui1.png");
+		sprSheet	= new olc::Sprite("../Sprites/Lui.png");
 		sprTown		= new olc::Sprite("../Sprites/Town.jpg");
 		sprBar		= new olc::Sprite("../Sprites/Bar.png");
 		// Decals assignment
 		decPerso	= new olc::Decal(sprPerso);
+		decSheet	= new olc::Decal(sprSheet);
 		decBar		= new olc::Decal(sprBar);
 		decTown		= new olc::Decal(sprTown);
 		no_scroll_rect_size.x = ScreenWidth() * no_scroll_ratio;
@@ -61,6 +68,10 @@ public:
 		world_perso_pos.y = sprTown->height / 2;
 		screen_pos = { 0.0f, 0.0f };
 
+		// Animation
+		strike_animation = 0;
+		strike_animation_timer = 0.0f;
+
 		return true;
 	}
 
@@ -81,8 +92,6 @@ public:
 		Clear(olc::BLANK);
 
 		// Handle inputs
-		olc::vf2d mouse = { static_cast<float>(GetMouseX()),
-							static_cast<float>(GetMouseY()) };
 		// Accelerate
 		if (GetKey(olc::Key::Z).bHeld) {
 			perso_speed.y += perso_acc.y*fElapsedTime;
@@ -183,8 +192,42 @@ public:
 		}
 
 		// Drawing the scene
-		// Layer 0
-		DrawDecal(perso_pos, decPerso);
+		// Layer 0 -> Perso
+		// Strike animation
+		if (GetMouse(0).bHeld && strike_animation==0) {
+			strike_animation = 1; // Trigger animation
+		}
+		switch(strike_animation){
+		case 0:
+			break; // Nothing to do in that case
+		case 1:
+			DrawPartialDecal(perso_pos, decSheet, { 142,69 }, { 45,62 });
+			strike_animation_timer += fElapsedTime*1e3;
+			if (strike_animation_timer > 200.0f) strike_animation++;
+			break;
+		case 2:
+			DrawPartialDecal(perso_pos, decSheet, { 202,69 }, { 45,62 });
+			strike_animation_timer += fElapsedTime * 1e3;
+			if (strike_animation_timer > 200.0f) strike_animation++;
+			break;
+		case 3:
+			DrawPartialDecal(perso_pos, decSheet, { 256,69 }, { 45,62 });
+			strike_animation_timer += fElapsedTime * 1e3;
+			if (strike_animation_timer > 200.0f) strike_animation++;
+			break;
+		case 4:
+			DrawPartialDecal(perso_pos, decSheet, { 320,69 }, { 45,62 });
+			strike_animation_timer += fElapsedTime * 1e3;
+			if (strike_animation_timer > 400.0f) {
+				strike_animation = 0;
+				strike_animation_timer = 0.0f;
+			}
+			break;
+		}
+		
+		if (strike_animation == 0) {
+			DrawDecal(perso_pos, decPerso); // Draw normal, standing character
+		}
 		olc::vf2d bar_perso = { perso_pos.x + 50, perso_pos.y + 50 };
 
 		// HUD layer
@@ -210,11 +253,13 @@ public:
 		float scale_bar = 4e-2;
 		olc::vf2d bar_pos;
 		// Display the speed bar
+		float min_speed_norm = std::sqrt(	perso_def_speed.x*perso_def_speed.x +
+											perso_def_speed.y*perso_def_speed.y);
 		float max_speed_norm = std::sqrt(	perso_max_speed.x*perso_max_speed.x +
 											perso_max_speed.y*perso_max_speed.y);
 		float perso_speed_norm = std::sqrt(	perso_speed.x*perso_speed.x +
 											perso_speed.y*perso_speed.y);
-		int nBars = 20 * perso_speed_norm / max_speed_norm;
+		int nBars = 20 * (perso_speed_norm-min_speed_norm) / (max_speed_norm - min_speed_norm);
 		for (int i = 0; i < nBars; ++i) {
 			// Height and width mixed because of rotation
 			bar_pos.x = (2+i) * sprBar->height*scale_bar; 
