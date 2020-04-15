@@ -1,4 +1,4 @@
-#define OLC_PGE_APPLICATION
+//#define OLC_PGE_APPLICATION
 #include "../../olcPixelGameEngine/olcPixelGameEngine.h"
 constexpr auto M_PI = 3.14159265358979323846;
 
@@ -277,11 +277,11 @@ public:
 	}
 };
 
-
+/*
 int main() {
 	Essai demo;
 	if (demo.Construct(1280, 720, 1, 1))
 		demo.Start();
 
 	return 0;
-}
+}*/
