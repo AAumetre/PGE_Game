@@ -19,7 +19,7 @@ public:
 	~Camera() {};
 
 	inline void assignFocusPoint(PhysicalObject* focus_point_) { _focus_point = focus_point_; }
-	void focus(void);
+	void focus(float fElapsedTime);
 	void init();
 
 private:

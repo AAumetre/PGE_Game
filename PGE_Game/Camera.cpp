@@ -1,13 +1,29 @@
 #include "Camera.h"
 
-void Camera::focus(void)
+void Camera::focus(float fElapsedTime)
 {
 	if (!_focus_point) { // No focus point was set
 		std::cout << "WARNING: no focus point was set for camera " + _name << std::endl;
 		return;
 	}
+
 	// Compute focus point position on the screen
 	olc::vf2d focus_p = _focus_point->getPosition() - _position;
+
+	// Compute the displacement wrt to the center of the screen
+	olc::vf2d center = { static_cast<float>(_width/2.0f), static_cast<float>(_height/2.0f) };
+	olc::vf2d dis_center = focus_p - center;
+
+	// Compute the dynamic behavior of the camera wrt to the focus_p
+	// TODO: implement simple spring-like dynamic:	m*x" - k*x = 0
+	float focus_smoothing = 1.0f;
+	// olc::vf2d delta = focus_smoothing * dis_center*fElapsedTime;
+	olc::vf2d delta = dis_center;
+	
+	_position += delta;
+
+
+	/* First version with a rectangle, not working at the moment
 	// Out-of-focus limit inside the screen
 	//     A +------------+B
 	//P+     |			  |
@@ -98,7 +114,8 @@ void Camera::focus(void)
 		else {
 			perso_pos.y += delta;
 		}
-	}*/
+	}
+	*/
 }
 
 void Camera::init()

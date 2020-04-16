@@ -5,6 +5,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <map>
 #include <algorithm> 	// copy_if
 #include <tuple> 		// tuple
 #include <functional>	// placeholders

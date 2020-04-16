@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Character.cpp" />
+    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainObj.cpp" />
     <ClCompile Include="PhysicalObject.cpp" />
@@ -136,6 +137,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Character.h" />
+    <ClInclude Include="HUD.h" />
     <ClInclude Include="Onthology.h" />
     <ClInclude Include="PhysicalObject.h" />
     <ClInclude Include="Region.h" />

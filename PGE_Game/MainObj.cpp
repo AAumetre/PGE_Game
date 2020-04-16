@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "Character.h"
+#include "HUD.h"
 
 class Game : public olc::PixelGameEngine
 {
@@ -19,22 +20,26 @@ public:
 		_player = new Player(1, "Toto", "../Sprites/Lui1.png");
 		_player->setPosition({ 200,200 });
 
+		// Create the HUD
+		_hud = new HUD(2, "Main HUD", _player);
+
 		// Create 3 more layers layers
 		for (int i = 0; i < 3; ++i) {
 			CreateLayer();
 			EnableLayer(i+1, true); // Layer 0 already exists
 		}
-
-		// Initialize the scene
+		// Initialize the scene with these layers
 		_scene = new Scene(_region, _player, 4);
 
 		// Initialize the camera
 		_camera = new Camera(ScreenWidth(), ScreenHeight());
-		_camera->setPosition({ -20,-20 });
 		_camera->assignFocusPoint(_player);
 		
-		// Set _region to layer 1
-		_scene->moveToLayer(1, _region);
+		// Set _region to layer 2
+		_scene->moveToLayer(2, _region);
+
+		// Set the HUD to layer 1
+		_scene->moveToLayer(1, _hud);
 
 		// Set the player to layer 0
 		_scene->moveToLayer(0, _player);
@@ -49,10 +54,9 @@ public:
 		handleInputs(fElapsedTime);
 
 		// Compute stuff
-		_camera->focus();
+		_camera->focus(fElapsedTime);
 		limitCameraToRegion();
-		// Update background drawing position
-		_region->setPosition( -1*_camera->getPosition() );
+		_hud->update();
 
 		// Render everything
 		renderAll();
@@ -84,6 +88,11 @@ public:
 				else if (elem->getSprite() != nullptr) {
 					DrawSprite(elem_position, elem->getSprite(), elem->getScale().x);
 				}
+				if (elem->hasText()) {
+					for (const auto& msg : elem->getText()) {
+						DrawString(msg.second._position, msg.second._content, msg.second._color, msg.second._scale);
+					}
+				}
 			}
 			layer_index++;
 		}
@@ -92,21 +101,31 @@ public:
 	void setupLayer(unsigned int layer_index_) {
 		switch (layer_index_) {
 		case 0:
+			SetPixelMode(olc::Pixel::NORMAL);
 			SetDrawTarget(nullptr);
 			Clear(olc::BLANK);
 			SetPixelMode(olc::Pixel::NORMAL);
 			break;
 
 		case 1:
+			SetPixelMode(olc::Pixel::NORMAL);
 			SetDrawTarget(1);
 			Clear(olc::BLANK);
 			SetPixelMode(olc::Pixel::NORMAL);
 			break;
 
 		case 2:
+			SetPixelMode(olc::Pixel::NORMAL);
+			SetDrawTarget(2);
+			Clear(olc::WHITE);
+			SetPixelMode(olc::Pixel::NORMAL);
 			break;
 
 		case 3:
+			SetPixelMode(olc::Pixel::NORMAL);
+			SetDrawTarget(3);
+			Clear(olc::WHITE);
+			SetPixelMode(olc::Pixel::NORMAL);
 			break;
 
 		default:
@@ -148,18 +167,18 @@ public:
 	}
 
 	void limitCameraToRegion() {
-		// Limit screen to world
 		if (_camera->getPosition().x + ScreenWidth() > _region->getSprite()->width)
-			_camera->setPositionX(_region->getSprite()->width - ScreenWidth() );
+			_camera->setPositionX(_region->getSprite()->width - ScreenWidth());
 		if (_camera->getPosition().x < 0) _camera->setPositionX( 0.0f );
-		if (_camera->getPosition().y + ScreenHeight() > _region->getSprite()->height)
-			_camera->setPositionY(_region->getSprite()->height - ScreenHeight() );
+		if (_camera->getPosition().y + ScreenHeight() > _region->getSprite()->height) 
+			_camera->setPositionY(_region->getSprite()->height - ScreenHeight());
 		if (_camera->getPosition().y < 0) _camera->setPositionY(0.0f);
 	}
 
 private:
 	Scene*	_scene;
 	Region* _region;
+	HUD*	_hud;
 	Camera* _camera;
 	Player* _player;
 };

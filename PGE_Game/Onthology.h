@@ -12,4 +12,4 @@ class Door {};		// Allows to go from one region to an other
 // class Scene {};		// Contains references to all the VisibleObject to be drawn
 // class Camera {};	//
 // class Player {};	//
-class HUD {};		// Head-Up Display class
+// class HUD {};		// Head-Up Display class
