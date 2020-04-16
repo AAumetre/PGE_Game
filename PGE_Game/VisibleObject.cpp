@@ -1,10 +1,13 @@
 #include "VisibleObject.h"
+#include "Logger.h"
 
 bool VisibleObject::addText(Text text_)
 {
 	// Check if the given ID is unique
 	if (_text.count(text_._ID) > 0) {
-		std::cout << "WARNING: the provided text ID is already present" << std::endl;
+		std::string msg = "the provided text ID(" + text_._ID;
+		msg += " is already present";
+		warn(this, msg);
 		return false;
 	}
 	// Proceed
@@ -25,7 +28,9 @@ bool VisibleObject::removeText(int ID_)
 		return true;
 	}
 	// At this point, the element has not been found
-	std::cout << "WARNING: the provided text ID was not found" << std::endl;
+	std::string msg = "the provided text ID(" + ID_;
+	msg += " was not found";
+	warn(this, msg);
 	return false;
 }
 

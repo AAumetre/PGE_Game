@@ -14,13 +14,17 @@
  // Layers as vectors of VisibleObject
 using Layers = std::vector< std::vector<VisibleObject*> > ;
 
-class Scene
+class Scene :
+	public TrackedObject
 {
 public:
 	// Constructor & Destructor
+	Scene(unsigned int UID_, std::string name_)	: TrackedObject(UID_, name_) {};
 	~Scene() {};
-	Scene(const Region* region_, const Player* player_, unsigned int n_layers_) :
-		_region(region_), _player(player_) {
+	Scene(unsigned int UID_, std::string name_, const Region* region_,
+		const Player* player_, unsigned int n_layers_) :
+		TrackedObject(UID_, name_), _region(region_), _player(player_)
+	{
 		_layers.resize(n_layers_);
 	}
 

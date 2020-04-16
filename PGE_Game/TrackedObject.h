@@ -19,7 +19,7 @@ public:
 	std::shared_ptr<TrackedObject> getChild(std::string name_);
 	std::shared_ptr<TrackedObject> getChild(unsigned int UID_);
 	// TODO: _children needs to be iterated over
-
+	// TODO: use map ffs !!!!
 
 protected:
 	// Properties

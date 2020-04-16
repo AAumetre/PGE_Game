@@ -4,12 +4,12 @@
 #include "Camera.h"
 #include "Character.h"
 #include "HUD.h"
+#include "Logger.h"
 
 class Game : public olc::PixelGameEngine
 {
 public:
 	Game() { sAppName = "An OOP game"; }
-
 
 	// Pixel Game Engine methods
 	bool OnUserCreate() override {
@@ -29,7 +29,7 @@ public:
 			EnableLayer(i+1, true); // Layer 0 already exists
 		}
 		// Initialize the scene with these layers
-		_scene = new Scene(_region, _player, 4);
+		_scene = new Scene(3, "Main scene", _region, _player, 4);
 
 		// Initialize the camera
 		_camera = new Camera(ScreenWidth(), ScreenHeight());

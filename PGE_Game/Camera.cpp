@@ -1,9 +1,10 @@
 #include "Camera.h"
+#include "Logger.h"
 
 void Camera::focus(float fElapsedTime)
 {
 	if (!_focus_point) { // No focus point was set
-		std::cout << "WARNING: no focus point was set for camera " + _name << std::endl;
+		warn(this, "no focus point was set for this camera.");
 		return;
 	}
 
