@@ -21,6 +21,8 @@ public:
 	// These methods allow to by-pass the physical behavior of the object
 	// Set the position
 	inline void setPosition(olc::vf2d position_)	{ _position = position_; }
+	// Set the speed
+	inline void setSpeed(olc::vf2d speed_)	{ _speed = speed_; }
 	// Set the position only on x/y
 	inline void setPositionX(float x_)	{ _position.x = x_; }
 	inline void setPositionY(float y_)	{ _position.y = y_; }
