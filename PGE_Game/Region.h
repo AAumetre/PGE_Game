@@ -11,6 +11,9 @@ public:
 		setVisual(file_path_);
 	};
 
+	void setCollisionZone(std::string file_path_);
+	inline auto getCollisionZone(void) { return _collision_zone; }
+
 private:
 	// Sub-regions
 	std::vector< std::shared_ptr<Region> > _sub_regions; // superseeded by _children ?
@@ -20,5 +23,6 @@ private:
 	std::vector< Music* > _musics;		// Not implemented
 	std::vector< Sound* > _sounds;		// Not implemented
 
+	olc::Sprite* _collision_zone;
 };
 

@@ -12,12 +12,11 @@ public:
 	~PhysicalObject() {};
 	
 	// Accessors
-	inline auto getPosition(void)		const { return _position; }
-	inline auto getSpeed(void)			const { return _speed; }
+	inline auto getPosition(void)			const { return _position; }
+	inline auto getSpeed(void)				const { return _speed; }
 	inline auto getMaxSpeed(void)			const { return _max_speed; }
-	inline auto getAcceleration(void)	const { return _acceleration; }
+	inline auto getAcceleration(void)		const { return _acceleration; }
 	inline auto getMaxAcceleration(void)	const { return _max_acceleration; }
-	inline auto getSize(void)			const { return _size; }
 
 	// These methods allow to by-pass the physical behavior of the object
 	// Set the position
@@ -35,6 +34,9 @@ public:
 	// Computes speed & position
 	void compute(float fElapsedTime, olc::vf2d input_force_);
 
+	inline auto getCollisionRect(void) { return _collision_rect; }
+	void setCollisionRect(olc::vf2d x1, olc::vf2d x2);
+
 protected:
 	// These are defined in the current region frame of reference
 	olc::vf2d _position;
@@ -46,8 +48,9 @@ protected:
 	double _breaking_force;
 	double _max_speed; // Note: on normal objects, a natural maximum speed is reached
 	double _min_speed;
-
 	double		_mass;
-	olc::vf2d	_size; // Width, Height of the object
+
+	//std::vector<olc::vf2d> _collision_points;
+	std::array<olc::vf2d, 2> _collision_rect; // top-left and bottom-right corners
 };
 

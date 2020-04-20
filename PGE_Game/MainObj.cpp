@@ -15,10 +15,16 @@ public:
 	bool OnUserCreate() override {
 		// Create a region
 		_region = new Region(static_cast<int>(0), "First region", "../Sprites/Town.jpg");
+		_region->setCollisionZone("../Sprites/Town_Collisions.png");
 
 		// Create the main character
 		_player = new Player(1, "Toto", "../Sprites/Lui1.png");
 		_player->setPosition({ 200, 200 });
+		// Assign it its collision zone
+		_player->setCollisionRect(	{	0.0f,
+										static_cast<float>(0.5*_player->getSprite()->height) },
+									{	static_cast<float>(_player->getSprite()->width),
+										static_cast<float>(_player->getSprite()->height) } );
 
 		// ...and its arch-enemy
 		_ennemy = new Character(4, "Titi", "../Sprites/Lui1.png");
@@ -57,6 +63,7 @@ public:
 		// Take-in user inputs
 		Game::handleInputs(fElapsedTime);
 		_ennemy->compute(fElapsedTime, 1.0e3*(_player->getPosition() - _ennemy->getPosition()));
+		detectCollisionsWithRegion();
 
 		// Compute stuff
 		_camera->focus(fElapsedTime);
@@ -77,7 +84,7 @@ public:
 			for (auto elem : layer) {
 				// Compute the on-screen (camera) position
 				olc::vi2d elem_position = elem->getPosition() - _camera->getPosition();
-				if (elem->getDecal() != nullptr) {
+				if (elem->getDecal() != nullptr) { // Prefer decals to sprites
 					DrawDecal(elem_position, elem->getDecal(), elem->getScale(), elem->getTint());
 				}
 				else if (elem->getSprite() != nullptr) {
@@ -154,6 +161,26 @@ public:
 		if (_camera->getPosition().y + ScreenHeight() > _region->getSprite()->height) 
 			_camera->setPositionY(_region->getSprite()->height - ScreenHeight());
 		if (_camera->getPosition().y < 0) _camera->setPositionY(0.0f);
+	}
+
+	void detectCollisionsWithRegion() {
+		// Define the region to analyze
+		olc::vf2d p = _player->getPosition() - _region->getPosition();
+		olc::vi2d start = p + _player->getCollisionRect()[0];
+		olc::vi2d finish = p + _player->getCollisionRect()[1];
+		// Count pixels with 0xff alpha in the player's zone
+		int pxl_count = 0;
+		for (int j = start.y; j < finish.y; ++j) {
+			for (int i = start.x; i < finish.x; ++i) {
+				if (_region->getCollisionZone()->GetPixel(i, j).a == 0xff) {
+					pxl_count++;
+				}
+			}
+		}
+		if (pxl_count > 0) { // Collision detected
+			// What to do?
+			std::cout << pxl_count << " ";
+		}
 	}
 
 private:

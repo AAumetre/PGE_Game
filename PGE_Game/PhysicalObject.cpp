@@ -18,3 +18,9 @@ void PhysicalObject::compute(float fElapsedTime, olc::vf2d input_force_)
 		_speed = _speed / _speed.mag() * _max_speed;
 	}
 }
+
+void PhysicalObject::setCollisionRect(olc::vf2d x1_, olc::vf2d x2_)
+{
+	_collision_rect[0] = x1_;
+	_collision_rect[1] = x2_;
+}

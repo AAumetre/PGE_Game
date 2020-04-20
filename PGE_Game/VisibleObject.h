@@ -30,7 +30,6 @@ public:
 		_scale({ 1.0f,1.0f }), _tint(olc::WHITE)
 	{
 		setVisual(file_path_);
-		_size = {static_cast<float>(_spr->width), static_cast<float>(_spr->height)};
 	};
 	~VisibleObject() {};
 
