@@ -18,7 +18,12 @@ public:
 
 		// Create the main character
 		_player = new Player(1, "Toto", "../Sprites/Lui1.png");
-		_player->setPosition({ 200,200 });
+		_player->setPosition({ 200, 200 });
+
+		// ...and its arch-enemy
+		_ennemy = new Character(4, "Titi", "../Sprites/Lui1.png");
+		_ennemy->setPosition({ 200, 200 });
+		_ennemy->setTint(olc::RED);
 
 		// Create the HUD
 		_hud = new HUD(2, "Main HUD", _player);
@@ -40,6 +45,7 @@ public:
 
 		// Set the HUD to layer 1
 		_scene->moveToLayer(1, _hud);
+		_scene->moveToLayer(1, _ennemy);
 
 		// Set the player to layer 0
 		_scene->moveToLayer(0, _player);
@@ -47,11 +53,10 @@ public:
 		return true;
 	}
 
-	// double time_out = 0.0f;
-
 	bool OnUserUpdate(float fElapsedTime) override {
 		// Take-in user inputs
 		Game::handleInputs(fElapsedTime);
+		_ennemy->compute(fElapsedTime, 1.0e3*(_player->getPosition() - _ennemy->getPosition()));
 
 		// Compute stuff
 		_camera->focus(fElapsedTime);
@@ -66,8 +71,6 @@ public:
 	}
 
 	void renderAll(void) {
-		// Should depend on the camera
-		// The positions should be computed via the camera
 		unsigned int layer_index = 0;
 		for (auto layer : *_scene->getLayers()) {
 			Game::setupLayer(layer_index);
@@ -109,14 +112,14 @@ public:
 		case 2:
 			SetPixelMode(olc::Pixel::NORMAL);
 			SetDrawTarget(2);
-			Clear(olc::WHITE);
+			Clear(olc::VERY_DARK_BLUE);
 			SetPixelMode(olc::Pixel::NORMAL);
 			break;
 
 		case 3:
 			SetPixelMode(olc::Pixel::NORMAL);
 			SetDrawTarget(3);
-			Clear(olc::WHITE);
+			Clear(olc::VERY_DARK_BLUE);
 			SetPixelMode(olc::Pixel::NORMAL);
 			break;
 
@@ -126,36 +129,22 @@ public:
 	}
 
 	void handleInputs(float fElapsedTime) {
-		// Accelerate
+		olc::vf2d input_a = { 0.0f, 0.0f };
+		// Up/Down/Left/Right directions
 		if (GetKey(olc::Key::Q).bHeld) {
-			_player->incrSpeed({ _player->getAcceleration().x*fElapsedTime, 0.0f });
-			if (_player->getSpeed().x > _player->getMaxSpeed().x) _player->setMaxSpeedX();
-			_player->incrPosition({ -_player->getSpeed().x*fElapsedTime, 0});
+			input_a.x -= _player->getMaxAcceleration();
 		}
 		if (GetKey(olc::Key::D).bHeld) {
-			_player->incrSpeed({ _player->getAcceleration().x*fElapsedTime, 0.0f });
-			if (_player->getSpeed().x > _player->getMaxSpeed().x) _player->setMaxSpeedX();
-			_player->incrPosition({ _player->getSpeed().x*fElapsedTime, 0});
+			input_a.x += _player->getMaxAcceleration();
 		}
 		if (GetKey(olc::Key::Z).bHeld) {
-			_player->incrSpeed({ 0.0f, _player->getAcceleration().y*fElapsedTime });
-			if (_player->getSpeed().y > _player->getMaxSpeed().y) _player->setMaxSpeedY();
-			_player->incrPosition({ 0, -_player->getSpeed().y*fElapsedTime } );
+			input_a.y -= _player->getMaxAcceleration();
 		}
 		if (GetKey(olc::Key::S).bHeld) {
-			_player->incrSpeed({ 0.0f, _player->getAcceleration().y*fElapsedTime });
-			if (_player->getSpeed().y > _player->getMaxSpeed().y) _player->setMaxSpeedY();
-			_player->incrPosition({ 0, _player->getSpeed().y*fElapsedTime } );
+			input_a.y += _player->getMaxAcceleration();
 		}
-		// Decelerate twice as much
-		if (!GetKey(olc::Key::Q).bHeld && !GetKey(olc::Key::D).bHeld) {
-			_player->incrSpeed({-2.0f*_player->getAcceleration().x*fElapsedTime, 0.0f});
-			if (_player->getSpeed().x < _player->getMinSpeed().x) _player->setMinSpeedX();
-		}
-		if (!GetKey(olc::Key::Z).bHeld && !GetKey(olc::Key::S).bHeld) {
-			_player->incrSpeed({ 0.0f, -2.0f*_player->getAcceleration().x*fElapsedTime });
-			if (_player->getSpeed().y < _player->getMinSpeed().y) _player->setMinSpeedY();
-		}
+		// Updating the player's physical quantities
+		_player->compute(fElapsedTime, input_a);
 	}
 
 	void limitCameraToRegion() {
@@ -168,11 +157,12 @@ public:
 	}
 
 private:
-	Scene*	_scene;
-	Region* _region;
-	HUD*	_hud;
-	Camera* _camera;
-	Player* _player;
+	Scene*		_scene;
+	Region*		_region;
+	HUD*		_hud;
+	Camera*		_camera;
+	Player*		_player;
+	Character*	_ennemy;
 };
 
 int main() {

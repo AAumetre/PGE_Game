@@ -30,6 +30,7 @@ public:
 		_scale({ 1.0f,1.0f }), _tint(olc::WHITE)
 	{
 		setVisual(file_path_);
+		_size = {static_cast<float>(_spr->width), static_cast<float>(_spr->height)};
 	};
 	~VisibleObject() {};
 
@@ -39,6 +40,8 @@ public:
 	inline const auto getDecal(void) { return _dec; }
 	inline const auto getScale(void)	{ return _scale; }
 	inline const auto getTint(void)		{ return _tint; }
+
+	inline void setTint(olc::Pixel tint_) { _tint = tint_; }
 
 	inline const auto	getText(void)	{ return _text; }
 	inline bool			hasText(void)	{ return _has_active_text; }
