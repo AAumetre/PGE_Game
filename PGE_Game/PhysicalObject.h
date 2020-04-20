@@ -11,15 +11,15 @@ public:
 	~PhysicalObject() {};
 	
 	// Accessors
-	inline const auto getPosition(void)		{ return _position; }
-	inline const auto getSpeed(void)		{ return _speed; }
-	inline const auto getAcceleration(void) { return _acceleration; }
-	inline const auto getMinSpeed(void)		{ return _min_speed; }
-	inline const auto getMaxSpeed(void)		{ return _max_speed; }
-	inline const auto getSize(void)			{ return _size; }
+	inline auto getPosition(void)		const { return _position; }
+	inline auto getSpeed(void)			const { return _speed; }
+	inline auto getAcceleration(void)	const { return _acceleration; }
+	inline auto getMinSpeed(void)		const { return _min_speed; }
+	inline auto getMaxSpeed(void)		const { return _max_speed; }
+	inline auto getSize(void)			const { return _size; }
 
 	// Set the position
-	inline void setPosition(olc::vf2d& position_)	{ _position = position_; }
+	// inline void setPosition(olc::vf2d& position_)	{ _position = position_; }
 	inline void setPosition(olc::vf2d position_)	{ _position = position_; }
 
 	// Set the position only on x/y

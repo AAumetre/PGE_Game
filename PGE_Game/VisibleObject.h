@@ -34,8 +34,9 @@ public:
 	~VisibleObject() {};
 
 	// Accessors
-	inline const auto getSprite(void)	{ return _spr; }
-	inline const auto getDecal(void)	{ return _dec; }
+	inline const auto getSprite(void) { return _spr; }
+	inline const auto getSprite(void) const { return _spr; }
+	inline const auto getDecal(void) { return _dec; }
 	inline const auto getScale(void)	{ return _scale; }
 	inline const auto getTint(void)		{ return _tint; }
 

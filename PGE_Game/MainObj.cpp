@@ -51,24 +51,16 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime) override {
 		// Take-in user inputs
-		handleInputs(fElapsedTime);
+		Game::handleInputs(fElapsedTime);
 
 		// Compute stuff
 		_camera->focus(fElapsedTime);
-		limitCameraToRegion();
+		Game::limitCameraToRegion();
+		_scene->limitCharactersToRegion();
 		_hud->update();
 
 		// Render everything
-		renderAll();
-
-		/*time_out += fElapsedTime;
-		if (time_out > 0.5) {
-			std::cout << "=========================================================================" << std::endl;
-			std::cout << "Elapsed time: " << 1e3*fElapsedTime << " ms" << std::endl;
-			std::cout << "Position: " << _player->getPosition().x << " " << _player->getPosition().y << std::endl;
-			std::cout << "Speed: " << _player->getSpeed().x << " " << _player->getSpeed().y << std::endl;
-			time_out = 0.0;
-		}*/
+		Game::renderAll();
 
 		return true;
 	}

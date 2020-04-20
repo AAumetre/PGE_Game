@@ -5,14 +5,15 @@ class TrackedObject
 {
 public:
 	// Constructor & Destructor
+	TrackedObject() = delete; // Force the use of the constructor with UID and name
 	TrackedObject(unsigned int UID_, std::string name_) : _UID(UID_), _name(name_) {};
 	~TrackedObject() {};
 
 	// Accessors, inlined
-	inline void			setUID(int UID_)			{ _UID = UID_; }
-	inline void			setName(std::string name_)	{ _name = name_; }
-	inline unsigned int	getUID(void)				{ return _UID; }
-	inline std::string	getName(void)				{ return _name; }
+	inline	void			setUID(int UID_)					{ _UID = UID_; }
+	inline	void			setName(std::string name_)			{ _name = name_; }
+	inline 	unsigned int	getUID(void)				const	{ return _UID; }
+	inline 	std::string		getName(void)				const	{ return _name; }
 	//inline unsigned int	getChildCount(void)			{ return _children.size; }
 	// Accessors, not inlined
 	void addChild(std::shared_ptr<TrackedObject> child_);
