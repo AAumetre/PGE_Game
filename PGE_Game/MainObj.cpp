@@ -22,16 +22,13 @@ public:
 		// Create the main character
 		_player = new Player(1, "Toto", "../Sprites/Lui1.png");
 		_player->setPosition({ 20, 20 });
-		// Assign it its collision zone
-		_player->setCollisionRect(	{	0.25f*static_cast<float>(_player->getSprite()->width),
-										0.8f*static_cast<float>(_player->getSprite()->height) },
-									{	0.75f*static_cast<float>(_player->getSprite()->width),
-										1.0f*static_cast<float>(_player->getSprite()->height) } );
+		_player->setCollisionRect(0.25f, 0.75f, 0.8f, 1.0f);
 
 		// ...and its arch-enemy
 		_ennemy = new Character(4, "Titi", "../Sprites/Lui1.png");
 		_ennemy->setPosition({ 20, 20 });
 		_ennemy->setTint(olc::RED);
+		_ennemy->setCollisionRect(0.25f, 0.75f, 0.8f, 1.0f);
 
 		// Create the HUD
 		_hud = new HUD(2, "Main HUD", _player);
@@ -43,6 +40,7 @@ public:
 		}
 		// Initialize the scene with these layers
 		_scene = new Scene(3, "Main scene", _region, _player, 4);
+		_scene->addCharacter(_ennemy);
 
 		// Initialize the camera
 		_camera = new Camera(ScreenWidth(), ScreenHeight());
@@ -64,10 +62,12 @@ public:
 	bool OnUserUpdate(float fElapsedTime) override {
 		// Take-in user inputs
 		Game::handleInputs(fElapsedTime);
+
+		// Update other character's positions
 		_ennemy->compute(fElapsedTime, 1.0e3*(_player->getPosition() - _ennemy->getPosition()));
-		detectCollisionsWithRegion(fElapsedTime);
 
 		// Compute stuff
+		_scene->detectCollisionsWithRegion(fElapsedTime);
 		_camera->focus(fElapsedTime);
 		Game::limitCameraToRegion();
 		_scene->limitCharactersToRegion();
@@ -84,7 +84,7 @@ public:
 		for (auto layer : *_scene->getLayers()) {
 			Game::setupLayer(layer_index);
 			for (auto elem : layer) {
-				// Compute the on-screen (camera) position
+				// Compute the on-screen position
 				olc::vi2d elem_position = elem->getPosition() - _camera->getPosition();
 				if (elem->getDecal() != nullptr) { // Prefer decals to sprites
 					DrawDecal(elem_position, elem->getDecal(), elem->getScale(), elem->getTint());
@@ -100,6 +100,10 @@ public:
 			}
 			layer_index++;
 		}
+		// Display zones for debug
+		SetDrawTarget(nullptr);
+		olc::vf2d zone_position = _player->getPosition() + _player->getCollisionRect()[0] - _camera->getPosition();
+		DrawRect(zone_position, _player->getCollisionRect()[1] - _player->getCollisionRect()[0], olc::BLUE);
 	}
 
 	void setupLayer(unsigned int layer_index_) {
@@ -152,6 +156,17 @@ public:
 		if (GetKey(olc::Key::S).bHeld) {
 			input_a.y += _player->getMaxAcceleration();
 		}
+
+		// Space bar to jump
+		if (GetKey(olc::Key::SPACE).bReleased) {
+			input_a.y -= 5 * _player->getMaxAcceleration();
+		}
+
+		// Mouse
+		if (GetMouse(0).bPressed) {
+			_ennemy->setGhost(!_ennemy->isGhost());
+		}
+
 		// Updating the player's physical quantities
 		_player->compute(fElapsedTime, input_a);
 	}
@@ -163,87 +178,6 @@ public:
 		if (_camera->getPosition().y + ScreenHeight() > _region->getSprite()->height) 
 			_camera->setPositionY(_region->getSprite()->height - ScreenHeight());
 		if (_camera->getPosition().y < 0) _camera->setPositionY(0.0f);
-	}
-
-	void detectCollisionsWithRegion(float fElapsedTime) {
-		// Limit of pixels from which we consider enforcing the collision
-		const int trigger = 20;
-		// Define the region to analyze
-		olc::vf2d p = _player->getPosition() - _region->getPosition();
-		olc::vi2d start = p + _player->getCollisionRect()[0];
-		olc::vi2d finish = p + _player->getCollisionRect()[1];
-		int width = (finish - start).x;
-		int height = (finish - start).y;
-
-		// Create the collision picture
-		std::vector<std::vector<uint8_t>> coll_pic; // line/col
-		coll_pic.resize(height);
-		for (auto& line : coll_pic)
-			line.resize(width);
-
-		int pxl_count = 0;
-		for (int j = start.y; j < finish.y; ++j) {
-			for (int i = start.x; i < finish.x; ++i) {
-				if (_region->getCollisionZone()->GetPixel(i, j).a == 0xff) {
-					pxl_count++;
-					coll_pic[(j - start.y)][(i - start.x)] = 1;
-				}
-				else {
-					coll_pic[(j - start.y)][(i - start.x)] = 0;
-				}
-			}
-		}
-
-		// Only do the heavy lifting if there are enough pixels	
-		if (pxl_count > trigger) { 
-			// Step 1: Set the player back to an acceptable position
-			_player->setPosition(_player->getPosition() - _player->getSpeed()*fElapsedTime);
-
-			// Step 2: Start computing the "normal" to the collision region
-			olc::vf2d normal{ 0.0f, 0.0f };
-			// Check for transitions line-by-line
-			uint8_t previous = 0;
-			for (int i = 0; i < height; ++i) {
-				previous = coll_pic[i][0];
-				for (int j = 1; j < width; ++j) { // Not interested in the first one
-					if (coll_pic[i][j] - previous == 0) {}// Nothing happens
-					else if (coll_pic[i][j] - previous == 1) { // W->B transition
-						normal += {-1.0f, 0.0f};
-						previous = 1;
-					}
-					else { // B->W transition
-						normal += {1.0f, 0.0f};
-						previous = 0;
-					}
-				}
-			}
-			// Check for transitions column-by-column
-			for (int j = 0; j < width; ++j) {
-				previous = coll_pic[0][j];
-				for (int i = 1; i < height; ++i) { // Not interested in the first one
-					if (coll_pic[i][j] - previous == 0) {}// Nothing happens
-					else if (coll_pic[i][j] - previous == 1) { // W->B transition
-						normal += {0.0f, -1.0f};
-						previous = 1;
-					}
-					else { // B->W transition
-						normal += {0.0f, 1.0f};
-						previous = 0;
-					}
-				}
-			}
-			// Normalize the vector
-			if (normal.mag() > 0.0f) {
-				normal = normal/normal.mag();
-
-				// Compute the speed vector to be added
-				olc::vf2d added_speed;
-				float dot_p = _player->getSpeed().x*normal.x + _player->getSpeed().y*normal.y;
-				const float bounce_efficiency = 0.4f;
-				// Bounce-off
-				_player->setSpeed(bounce_efficiency*(_player->getSpeed() - 2*dot_p*normal));
-			}
-		}
 	}
 
 private:

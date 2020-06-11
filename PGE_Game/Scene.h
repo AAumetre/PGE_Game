@@ -21,7 +21,7 @@ public:
 	// Constructor & Destructor
 	Scene(unsigned int UID_, std::string name_)	: TrackedObject(UID_, name_) {};
 	~Scene() {};
-	Scene(unsigned int UID_, std::string name_, const Region* region_,
+	Scene(unsigned int UID_, std::string name_, Region* region_,
 		Player* player_, unsigned int n_layers_) :
 		TrackedObject(UID_, name_), _region(region_)
 	{
@@ -34,9 +34,10 @@ public:
 	bool removeCharacter(const Character* char_);
 	void moveToLayer(unsigned int index_, VisibleObject* object_);
 	void limitCharactersToRegion(void);
+	void detectCollisionsWithRegion(float fElapsedTime);
 
 private:
-	const Region*				_region;
+	Region*				_region;
 	std::map< int, Character* >	_characters;
 	// const HUD*		_hud;
 

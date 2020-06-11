@@ -34,21 +34,20 @@ public:
 	~VisibleObject() {};
 
 	// Accessors
-	inline const auto getSprite(void) { return _spr; }
-	inline const auto getSprite(void) const { return _spr; }
-	inline const auto getDecal(void) { return _dec; }
-	inline const auto getScale(void)	{ return _scale; }
-	inline const auto getTint(void)		{ return _tint; }
-
+	inline auto getSprite(void) { return _spr; }
+	inline auto getDecal(void)	{ return _dec; }
+	inline auto getScale(void)	{ return _scale; }
+	inline auto getTint(void)	{ return _tint; }
 	inline void setTint(olc::Pixel tint_) { _tint = tint_; }
-
 	inline const auto	getText(void)	{ return _text; }
 	inline bool			hasText(void)	{ return _has_active_text; }
+	
 	bool addText(Text text_);
 	bool removeText(int ID_);
 	void updateTextStatus();
 
-	void setVisual(std::string file_path_);
+	void setVisual(std::string file_path_);  
+	void setCollisionRect(float rx1_, float rx2_, float ry1_, float ry2_);
 
 protected:
 	// Image storage

@@ -3,7 +3,7 @@
 
 bool VisibleObject::addText(Text text_)
 {
-	// Check if the given ID is unique
+	// Check if the given ID does not already exist
 	if (_text.count(text_._ID) > 0) {
 		std::string msg = "the provided text ID(" + text_._ID;
 		msg += " is already present";
@@ -54,8 +54,38 @@ void VisibleObject::setVisual(std::string file_path_)
 		_dec = new olc::Decal(_spr);
 	}
 	else if (_spr != nullptr) { // There is already a sprite assigned
+		log(this, "Sprite already assigned, deleting the former one.");
 		delete _spr;
 		delete _dec;
 		VisibleObject::setVisual(file_path_);
 	}
+}
+
+void VisibleObject::setCollisionRect(float rx1_, float rx2_, float ry1_, float ry2_)
+{
+	if (_spr == nullptr) {
+		std::string msg = "Collision rectangle for object " + _name;
+		msg += " and UID " + _UID;
+		msg += " could not be set: no sprite attached.";
+		warn(this, msg);
+		return;
+	}
+
+	// Ratios rx1, rx2 must be such that: 0 <= rx1 < rx2 <= 1 
+	bool ratios_x_valid = (0.0f <= rx1_) && (rx1_ < rx2_) && (rx2_ <= 1.0f);
+	// Idem for rxy 1 and ry2
+	bool ratios_y_valid = (0.0f <= ry1_) && (ry1_ < ry2_) && (ry2_ <= 1.0f);
+	if (!ratios_x_valid || !ratios_y_valid) {
+		std::string msg = "Invalid ratios for collision rectangle given to " + _name;
+		msg += " with UID " + _UID;
+		warn(this, msg);
+		return;
+	}
+
+	PhysicalObject::setCollisionRect(
+		{	rx1_*static_cast<float>(this->getSprite()->width),
+			ry1_*static_cast<float>(this->getSprite()->height) }
+		,
+		{	rx2_*static_cast<float>(this->getSprite()->width),
+			ry2_*static_cast<float>(this->getSprite()->height) });
 }

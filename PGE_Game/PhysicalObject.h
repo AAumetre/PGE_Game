@@ -8,7 +8,11 @@ public:
 	PhysicalObject(unsigned int UID_, std::string name_) 
 		: TrackedObject(UID_, name_), _position({ 0,0 }), _speed({0.0f, 0.0f}),
 		_acceleration({0.0f, 0.0f}), _max_acceleration(1.0e5), _max_speed(1.0e3),
-		_breaking_force(1.0e2), _mass(50.0f), _min_speed(10.0f) {};
+		_breaking_force(1.0e2), _mass(50.0f), _min_speed(100.0f) {
+		// Initialize the collision rectangle
+		_collision_rect[0] = { 0.0f, 0.0f };
+		_collision_rect[1] = { 0.0f, 0.0f };
+	};
 	~PhysicalObject() {};
 	
 	// Accessors

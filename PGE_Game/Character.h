@@ -1,14 +1,18 @@
 #pragma once
-#include "VisibleObject.h"
+#include "AnimatedObject.h"
+
 class Character :
-	public VisibleObject
+	public AnimatedObject
 {
 public:
 	Character(unsigned int UID_, std::string name_) :
-		VisibleObject(UID_, name_), _is_controlled(false), _health(100.0f), _is_ghost(false) {};
+		AnimatedObject(UID_, name_), _is_controlled(false), _health(100.0f), _is_ghost(false) {};
 	Character(unsigned int UID_, std::string name_, std::string file_path_) :
-		VisibleObject(UID_, name_, file_path_), _is_controlled(false), _health(100.0f), _is_ghost(false) {};
+		AnimatedObject(UID_, name_, file_path_), _is_controlled(false), _health(100.0f), _is_ghost(false) {};
 	~Character() {};
+
+	inline bool isGhost(void) { return _is_ghost; }
+	inline void setGhost(bool state_) { _is_ghost = state_; }
 
 protected:
 	bool _is_controlled;
