@@ -12,7 +12,7 @@ void AnimatedObject::setDefaultVisual(std::string path_, PoSize po_size_)
 		log(this, "Sprite already assigned, deleting the former one.");
 		delete _spr;
 		delete _dec;
-		AnimatedObject::setDefaultVisual(path_);
+		AnimatedObject::setDefaultVisual(path_, po_size_);
 	}
 }
 
@@ -40,6 +40,7 @@ bool AnimatedObject::triggerAnimation(size_t ID_)
 	return true;
 }
 
+/*
 auto AnimatedObject::getDecal()
 {
 	// If there is no animation, just return the default decal
@@ -47,4 +48,4 @@ auto AnimatedObject::getDecal()
 		return _dec;
 	}
 	// Set the right decal, as a function of local time
-}
+}*/

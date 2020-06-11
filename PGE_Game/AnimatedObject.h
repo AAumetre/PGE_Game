@@ -29,8 +29,8 @@ class AnimatedObject :
 	public VisibleObject
 {
 public:
-	// AnimatedObject(unsigned int UID_, std::string name_)
-	// 	: VisibleObject(UID_, name_) {}
+	AnimatedObject(unsigned int UID_, std::string name_)
+	 	: VisibleObject(UID_, name_) {}
 	AnimatedObject(unsigned int UID_, std::string name_, std::string file_path_)
 		: VisibleObject(UID_, name_, file_path_) {}
 	AnimatedObject(unsigned int UID_, std::string name_, std::string file_path_, PoSize po_size_)
@@ -46,7 +46,7 @@ public:
 
 	bool triggerAnimation(size_t ID_);
 
-	auto getDecal(void) override;
+	//auto getDecal(void) override;
 
 protected:
 	std::map<size_t, AnimationSheet> _animations;
